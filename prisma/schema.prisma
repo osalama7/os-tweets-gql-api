@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Tweets {
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  created_at              DateTime @default(now())
+  name                    String
+  text                    String?
+  conts                   String[]
+  current_user_retweet_id Float
+  url_entities            String[]
+  retweet_count           Float
+  in_reply_to_user_id     Float
+  in_reply_to_status_id   Float
+  source                  String
+}
