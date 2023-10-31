@@ -9,7 +9,7 @@ export interface DataSourceContext {
   }
 }
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ log: ['query', 'info'] });
 export const createContext = async () => ({
   prisma,
   auth: '',
