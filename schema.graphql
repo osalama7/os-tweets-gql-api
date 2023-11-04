@@ -1,11 +1,21 @@
 scalar Date
+scalar JSON
 
 schema {
   query: Query
+  mutation: Mutation
 }
 
 type Query {
   tweets(paginationOptions: paginate): [Tweet]!
+  gradientDescentJob(input: getGradientDescentJob): GradientDescentJob
+}
+
+type Mutation {
+  updateSentiment(input: updateSentimentInput!): updateSentimetResult
+  createGradientDescentJob(
+    input: createGradientDescentJobInput!
+  ): GradientDescentJob
 }
 
 enum Role {
@@ -16,6 +26,23 @@ enum Role {
 input paginate {
   skip: Int
   take: Int
+}
+
+input getGradientDescentJob {
+  version: String!
+}
+
+input updateSentimentInput {
+  id: ID!
+  sentiment: Float!
+}
+
+input createGradientDescentJobInput {
+  theta: [Float]!
+  cost: Float!
+  frequencies: JSON!
+  version: String!
+  sources: [String]!
 }
 
 type Tweet {
@@ -31,4 +58,21 @@ type Tweet {
   in_reply_to_user_id: Float
   in_reply_to_status_id: Float
   source: String
+  sentiment: String
+}
+
+type GradientDescentJob {
+  id: ID!
+  theta: [Float]
+  cost: Float
+  sources: [String]
+  createdAt: Date
+  updatedAt: Date
+  frequencies: JSON
+}
+
+type updateSentimetResult {
+  id: ID!
+  text: String!
+  sentiment: String!
 }

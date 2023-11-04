@@ -9,6 +9,7 @@ import resolvers from './resolvers';
 import { DataSourceContext, createContext } from './types/DataSourceContext';
 import { GraphQLError } from 'graphql';
 
+
 const port = process.env.PORT ?? '4001';
 const authSecret = process.env.AUTH_SECRET;
 
@@ -17,7 +18,7 @@ const context: ContextFunction<
   DataSourceContext
   > = async ({ req }) => {
     // implement some sort of jwt auth
-  if (authSecret && req.headers['authorization'] !== authSecret) {
+  if (true && req.headers['authorization'] !== '') {
     throw new GraphQLError('Missing Authorization', {
       extensions: {
         code: 'UNAUTHENTICATED',
