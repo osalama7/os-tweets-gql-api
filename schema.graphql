@@ -1,5 +1,6 @@
 scalar Date
 scalar JSON
+scalar DateTime
 
 schema {
   query: Query
@@ -7,20 +8,25 @@ schema {
 }
 
 type Query {
-  tweets(paginationOptions: paginate): [Tweet]!
+  tweets(input: paginate): TweetsFeed!
   gradientDescentJob(input: getGradientDescentJob): GradientDescentJob
 }
 
 type Mutation {
-  updateSentiment(input: updateSentimentInput!): updateSentimetResult
+  updateSentiment(input: [updateSentimentInput!]!): [updateSentimetResult]
   createGradientDescentJob(
     input: createGradientDescentJobInput!
   ): GradientDescentJob
+  getSentimentPrediction(input: GetSentimentInput): [NlpSentimentResult]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+input GetSentimentInput {
+  tweets: [JSON!]!
 }
 
 input paginate {
@@ -49,7 +55,7 @@ type Tweet {
   id: ID!
   id_str: Float
   name: String
-  text: String
+  text: String!
   conts: [String]
   created_at: Date
   current_user_retweet_id: Float
@@ -73,6 +79,34 @@ type GradientDescentJob {
 
 type updateSentimetResult {
   id: ID!
-  text: String!
   sentiment: String!
+}
+
+type PageInfo {
+  start: ID!
+  end: ID!
+  count: Int!
+}
+
+type TweetsFeed implements IPaginatedResource {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  nodes: [Tweet!]!
+  hasMore: Boolean!
+  cursor: Int
+}
+
+interface IPaginatedResource {
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+type NlpSentimentResult {
+  sentiment: String
+  id: ID
+}
+
+interface PredictTweet {
+  id: ID!
+  text: String!
 }
