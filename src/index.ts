@@ -7,25 +7,22 @@ import {
 } from '@apollo/server/standalone';
 import resolvers from './resolvers';
 import { DataSourceContext, createContext } from './types/DataSourceContext';
-import { GraphQLError } from 'graphql';
-
-
 const port = process.env.PORT ?? '4001';
-const authSecret = process.env.AUTH_SECRET;
+
 
 const context: ContextFunction<
   [StandaloneServerContextFunctionArgument],
   DataSourceContext
   > = async ({ req }) => {
     // implement some sort of jwt auth
-  if (true && req.headers['authorization'] !== '') {
-    throw new GraphQLError('Missing Authorization', {
-      extensions: {
-        code: 'UNAUTHENTICATED',
-        http: { status: 401 },
-      },
-    });
-  }
+  // if (true && req.headers['authorization'] !== '') {
+  //   throw new GraphQLError('Missing Authorization', {
+  //     extensions: {
+  //       code: 'UNAUTHENTICATED',
+  //       http: { status: 401 },
+  //     },
+  //   });
+  // }
 
   return createContext();
 };
@@ -36,7 +33,14 @@ export async function main() {
       encoding: 'utf-8',
     })
   );
-  const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    introspection: true,
+    apollo: {
+      key: process.env.APOLLO_KEY,
+    }
+  });
   const app = await startStandaloneServer(server, {
     context,
     listen: { port: Number.parseInt(port) },

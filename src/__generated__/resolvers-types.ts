@@ -16,7 +16,12 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   Date: { input: any; output: any; }
+  DateTime: { input: any; output: any; }
   JSON: { input: any; output: any; }
+};
+
+export type GetSentimentInput = {
+  tweets: Array<Scalars['JSON']['input']>;
 };
 
 export type GradientDescentJob = {
@@ -30,10 +35,16 @@ export type GradientDescentJob = {
   updatedAt?: Maybe<Scalars['Date']['output']>;
 };
 
+export type IPaginatedResource = {
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createGradientDescentJob?: Maybe<GradientDescentJob>;
-  updateSentiment?: Maybe<UpdateSentimetResult>;
+  getSentimentPrediction?: Maybe<Array<Maybe<NlpSentimentResult>>>;
+  updateSentiment?: Maybe<Array<Maybe<UpdateSentimetResult>>>;
 };
 
 
@@ -42,14 +53,37 @@ export type MutationCreateGradientDescentJobArgs = {
 };
 
 
+export type MutationGetSentimentPredictionArgs = {
+  input?: InputMaybe<GetSentimentInput>;
+};
+
+
 export type MutationUpdateSentimentArgs = {
-  input: UpdateSentimentInput;
+  input: Array<UpdateSentimentInput>;
+};
+
+export type NlpSentimentResult = {
+  __typename?: 'NlpSentimentResult';
+  id?: Maybe<Scalars['ID']['output']>;
+  sentiment?: Maybe<Scalars['String']['output']>;
+};
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  count: Scalars['Int']['output'];
+  end: Scalars['ID']['output'];
+  start: Scalars['ID']['output'];
+};
+
+export type PredictTweet = {
+  id: Scalars['ID']['output'];
+  text: Scalars['String']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
   gradientDescentJob?: Maybe<GradientDescentJob>;
-  tweets: Array<Maybe<Tweet>>;
+  tweets: TweetsFeed;
 };
 
 
@@ -59,7 +93,7 @@ export type QueryGradientDescentJobArgs = {
 
 
 export type QueryTweetsArgs = {
-  paginationOptions?: InputMaybe<Paginate>;
+  input?: InputMaybe<Paginate>;
 };
 
 export enum Role {
@@ -80,8 +114,17 @@ export type Tweet = {
   retweet_count?: Maybe<Scalars['Float']['output']>;
   sentiment?: Maybe<Scalars['String']['output']>;
   source?: Maybe<Scalars['String']['output']>;
-  text?: Maybe<Scalars['String']['output']>;
+  text: Scalars['String']['output'];
   url_entities?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+};
+
+export type TweetsFeed = IPaginatedResource & {
+  __typename?: 'TweetsFeed';
+  cursor?: Maybe<Scalars['Int']['output']>;
+  hasMore: Scalars['Boolean']['output'];
+  nodes: Array<Tweet>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type CreateGradientDescentJobInput = {
@@ -110,7 +153,6 @@ export type UpdateSentimetResult = {
   __typename?: 'updateSentimetResult';
   id: Scalars['ID']['output'];
   sentiment: Scalars['String']['output'];
-  text: Scalars['String']['output'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -182,21 +224,33 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
+  IPaginatedResource: ( TweetsFeed );
+  PredictTweet: never;
+}>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  GetSentimentInput: GetSentimentInput;
   GradientDescentJob: ResolverTypeWrapper<GradientDescentJob>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  IPaginatedResource: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['IPaginatedResource']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
+  NlpSentimentResult: ResolverTypeWrapper<NlpSentimentResult>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
+  PredictTweet: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['PredictTweet']>;
   Query: ResolverTypeWrapper<{}>;
   Role: Role;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Tweet: ResolverTypeWrapper<Tweet>;
+  TweetsFeed: ResolverTypeWrapper<TweetsFeed>;
   createGradientDescentJobInput: CreateGradientDescentJobInput;
   getGradientDescentJob: GetGradientDescentJob;
   paginate: Paginate;
@@ -208,15 +262,22 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Date: Scalars['Date']['output'];
+  DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
+  GetSentimentInput: GetSentimentInput;
   GradientDescentJob: GradientDescentJob;
   ID: Scalars['ID']['output'];
+  IPaginatedResource: ResolversInterfaceTypes<ResolversParentTypes>['IPaginatedResource'];
   Int: Scalars['Int']['output'];
   JSON: Scalars['JSON']['output'];
   Mutation: {};
+  NlpSentimentResult: NlpSentimentResult;
+  PageInfo: PageInfo;
+  PredictTweet: ResolversInterfaceTypes<ResolversParentTypes>['PredictTweet'];
   Query: {};
   String: Scalars['String']['output'];
   Tweet: Tweet;
+  TweetsFeed: TweetsFeed;
   createGradientDescentJobInput: CreateGradientDescentJobInput;
   getGradientDescentJob: GetGradientDescentJob;
   paginate: Paginate;
@@ -226,6 +287,10 @@ export type ResolversParentTypes = ResolversObject<{
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
+}
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
 }
 
 export type GradientDescentJobResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['GradientDescentJob'] = ResolversParentTypes['GradientDescentJob']> = ResolversObject<{
@@ -239,18 +304,44 @@ export type GradientDescentJobResolvers<ContextType = DataSourceContext, ParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type IPaginatedResourceResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['IPaginatedResource'] = ResolversParentTypes['IPaginatedResource']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'TweetsFeed', ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+}>;
+
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON';
 }
 
 export type MutationResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createGradientDescentJob?: Resolver<Maybe<ResolversTypes['GradientDescentJob']>, ParentType, ContextType, RequireFields<MutationCreateGradientDescentJobArgs, 'input'>>;
-  updateSentiment?: Resolver<Maybe<ResolversTypes['updateSentimetResult']>, ParentType, ContextType, RequireFields<MutationUpdateSentimentArgs, 'input'>>;
+  getSentimentPrediction?: Resolver<Maybe<Array<Maybe<ResolversTypes['NlpSentimentResult']>>>, ParentType, ContextType, Partial<MutationGetSentimentPredictionArgs>>;
+  updateSentiment?: Resolver<Maybe<Array<Maybe<ResolversTypes['updateSentimetResult']>>>, ParentType, ContextType, RequireFields<MutationUpdateSentimentArgs, 'input'>>;
+}>;
+
+export type NlpSentimentResultResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['NlpSentimentResult'] = ResolversParentTypes['NlpSentimentResult']> = ResolversObject<{
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  sentiment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PageInfoResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  end?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  start?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PredictTweetResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['PredictTweet'] = ResolversParentTypes['PredictTweet']> = ResolversObject<{
+  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   gradientDescentJob?: Resolver<Maybe<ResolversTypes['GradientDescentJob']>, ParentType, ContextType, Partial<QueryGradientDescentJobArgs>>;
-  tweets?: Resolver<Array<Maybe<ResolversTypes['Tweet']>>, ParentType, ContextType, Partial<QueryTweetsArgs>>;
+  tweets?: Resolver<ResolversTypes['TweetsFeed'], ParentType, ContextType, Partial<QueryTweetsArgs>>;
 }>;
 
 export type TweetResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['Tweet'] = ResolversParentTypes['Tweet']> = ResolversObject<{
@@ -265,25 +356,39 @@ export type TweetResolvers<ContextType = DataSourceContext, ParentType extends R
   retweet_count?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   sentiment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   source?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url_entities?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type TweetsFeedResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['TweetsFeed'] = ResolversParentTypes['TweetsFeed']> = ResolversObject<{
+  cursor?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hasMore?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['Tweet']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UpdateSentimetResultResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['updateSentimetResult'] = ResolversParentTypes['updateSentimetResult']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   sentiment?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = DataSourceContext> = ResolversObject<{
   Date?: GraphQLScalarType;
+  DateTime?: GraphQLScalarType;
   GradientDescentJob?: GradientDescentJobResolvers<ContextType>;
+  IPaginatedResource?: IPaginatedResourceResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
+  NlpSentimentResult?: NlpSentimentResultResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
+  PredictTweet?: PredictTweetResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Tweet?: TweetResolvers<ContextType>;
+  TweetsFeed?: TweetsFeedResolvers<ContextType>;
   updateSentimetResult?: UpdateSentimetResultResolvers<ContextType>;
 }>;
 

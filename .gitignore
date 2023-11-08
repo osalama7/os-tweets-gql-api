@@ -29,4 +29,4 @@ generated-schema.graphql
 
 .env
 
-data
+data/
