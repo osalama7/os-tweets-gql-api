@@ -7,7 +7,7 @@ import {
 } from '@apollo/server/standalone';
 import resolvers from './resolvers';
 import { DataSourceContext, createContext } from './types/DataSourceContext';
-const port = process.env.PORT ?? '4001';
+const port = Number.parseInt(process.env.PORT) || 4001;
 
 
 const context: ContextFunction<
@@ -43,7 +43,7 @@ export async function main() {
   });
   const app = await startStandaloneServer(server, {
     context,
-    listen: { port: Number.parseInt(port) },
+    listen: { port },
   });
 
   console.log(`🚀  Tweets GQL API ready at ${app.url}`);
